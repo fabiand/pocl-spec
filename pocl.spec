@@ -1,14 +1,12 @@
-%define revision 770
-%define bzr 20130811bzr%{revision}
 
-Summary: Portable Computing Language
-Name:    pocl
-Version: 0.8
-Release: 0.2.%{bzr}%{?dist}
-License: MIT
-Group:   System Environment/Libraries
-URL:     http://pocl.sourceforge.net
-Source0: pocl-0.8-pre-770.tar.gz
+Summary:  Portable Computing Language
+Name:     pocl
+Version:  0.8
+Release:  1%{?dist}
+License:  MIT
+Group:    System Environment/Libraries
+URL:      http://pocl.sourceforge.net
+Source0:  http://pocl.sourceforge.net/downloads/pocl-%{version}.tar.gz
 
 BuildRequires: pkgconfig automake autoconf libtool libtool-ltdl-devel
 BuildRequires: opencl-headers ocl-icd-devel clang
@@ -18,7 +16,19 @@ Requires: %{name}-libs = %{version}-%{release}
 
 
 %description
-Portable Computing Language runtime
+Pocl's goal is to become an efficient open source (MIT-licensed) implementation
+of the OpenCL 1.2 (and soon OpenCL 2.0) standard.
+
+In addition to producing an easily portable open-source OpenCL implementation,
+another major goal of this project is improving performance portability of
+OpenCL programs with compiler optimizations, reducing the need for
+target-dependent manual optimizations.
+
+At the core of pocl is the kernel compiler that consists of a set of LLVM
+passes used to statically transform kernels into work-group functions with
+multiple work-items, even in the presence of work-group barriers. These
+functions are suitable for parallelization in multiple ways (SIMD, VLIW,
+superscalar,...).
 
 
 %package libs
@@ -43,7 +53,7 @@ Portable Computing Lanugage development files
 
 
 %prep
-%setup -q -b0 -n %{name}-%{version}-pre-%{revision}
+%setup -q
 
 
 %build
@@ -75,16 +85,17 @@ find $RPM_BUILD_ROOT -type f -name '*.la' | xargs rm -f -- || :
 %files libs
 %defattr(-,root,root,-)
 %{_sysconfdir}/OpenCL/vendors/pocl.icd
-%{_libdir}/libpocl.so.1.2.0
+%{_libdir}/libpocl.so.1.1.0
 %{_libdir}/libpocl.so.1
 %{_libdir}/libpocl.so
-%{_libdir}/libpoclu.so.1.2.0
+%{_libdir}/libpoclu.so.1.1.0
 %{_libdir}/libpoclu.so.1
 %{_libdir}/libpoclu.so
 #woah
 %{_libdir}/pocl/x86_64/kernel-x86_64-redhat-linux-gnu.bc
-%{_libdir}/pocl/llvmopencl.so.3
-%{_libdir}/pocl/llvmopencl.so.3.0.0
+%{_libdir}/pocl/llvmopencl.so.1.1.0
+%{_libdir}/pocl/llvmopencl.so.1
+%{_libdir}/pocl/llvmopencl.so
 
 
 %files devel
@@ -104,6 +115,11 @@ find $RPM_BUILD_ROOT -type f -name '*.la' | xargs rm -f -- || :
 
 
 %changelog
+* Mon Aug 12 2013 Fabian Deutsch <fabiand@fedoraproject.org> - 0.8-1
+- Update to 0.8
+- Better description
+- Fix SourceUrl
+
 * Sun Aug 11 2013 Fabian Deutsch <fabiand@fedoraproject.org> - 0.8pre-0.2
 - Updated bzr snapshot
 
