@@ -2,7 +2,7 @@
 Summary:  Portable Computing Language
 Name:     pocl
 Version:  0.8
-Release:  2%{?dist}
+Release:  3%{?dist}
 License:  MIT
 Group:    System Environment/Libraries
 URL:      http://pocl.sourceforge.net
@@ -10,6 +10,9 @@ Source0:  http://pocl.sourceforge.net/downloads/pocl-%{version}.tar.gz
 
 # Only armv7l is supported
 ExcludeArch: armv7hl
+# PPC support is currently broken, due to path problems
+ExcludeArch: ppc
+ExcludeArch: ppc64
 
 BuildRequires: pkgconfig automake autoconf libtool libtool-ltdl-devel
 BuildRequires: opencl-headers ocl-icd-devel 
@@ -63,8 +66,8 @@ Portable Computing Lanugage development files
 
 
 %build
-autoreconf -v --install || exit 1
-%configure --disable-static
+%configure --disable-static \
+    --enable-icd --enable-tests-with-icd=default
 make %{?_smp_mflags}
 
 
@@ -73,6 +76,10 @@ make install DESTDIR=$RPM_BUILD_ROOT
 
 # NOTE: We intentionally don't ship *.la files
 find $RPM_BUILD_ROOT -type f -name '*.la' | xargs rm -f -- || :
+
+
+%check
+make check
 
 
 %post -p /sbin/ldconfig
@@ -84,46 +91,35 @@ find $RPM_BUILD_ROOT -type f -name '*.la' | xargs rm -f -- || :
 
 
 %files
-%defattr(-,root,root,-)
 %doc README
 %{_bindir}/pocl-standalone
 %{_datadir}/pocl/
-%{_datadir}/pocl/pocl-build
-%{_datadir}/pocl/pocl-kernel
-%{_datadir}/pocl/pocl-workgroup
 
 
 %files libs
-%defattr(-,root,root,-)
 %{_sysconfdir}/OpenCL/vendors/pocl.icd
 %{_libdir}/libpocl.so.1.1.0
 %{_libdir}/libpocl.so.1
 %{_libdir}/libpoclu.so.1.1.0
 %{_libdir}/libpoclu.so.1
-#woah
 %{_libdir}/pocl/
-%{_libdir}/pocl/llvmopencl.so.1.1.0
-%{_libdir}/pocl/llvmopencl.so.1
-%{_libdir}/pocl/*/kernel-*-redhat-linux-gnu.bc
 
 
 %files devel
-%defattr(-,root,root,-)
 %{_libdir}/libpoclu.so
 %{_libdir}/libpocl.so
 %{_libdir}/pocl/llvmopencl.so
-%{_includedir}/pocl
-%{_includedir}/pocl/_kernel.h
-%{_includedir}/pocl/pocl.h
-%{_includedir}/pocl/pocl_device.h
-%{_includedir}/pocl/arm/types.h
-%{_includedir}/pocl/tce/types.h
-%{_includedir}/pocl/*/types.h
-%{_includedir}/poclu.h
 %{_libdir}/pkgconfig/pocl.pc
+%{_includedir}/pocl/
+%{_includedir}/poclu.h
 
 
 %changelog
+* Wed Aug 14 2013 Fabian Deutsch <fabiand@fedoraproject.org> - 0.8-3
+- Add check
+- Enforce ICD usage
+- Fix duplicate file warnings
+
 * Tue Aug 13 2013 Fabian Deutsch <fabiand@fedoraproject.org> - 0.8-2
 - Own some dirs
 - Fix -devel libraries
