@@ -2,7 +2,7 @@
 Summary:  Portable Computing Language
 Name:     pocl
 Version:  0.8
-Release:  3%{?dist}
+Release:  4%{?dist}
 License:  MIT
 Group:    System Environment/Libraries
 URL:      http://pocl.sourceforge.net
@@ -21,7 +21,6 @@ BuildRequires: llvm-devel clang
 BuildRequires: hwloc-devel
 
 Requires: clang
-Requires: %{name}-libs = %{version}-%{release}
 
 
 %description
@@ -40,19 +39,10 @@ functions are suitable for parallelization in multiple ways (SIMD, VLIW,
 superscalar,...).
 
 
-%package libs
-Summary:  Portable Computing Lanugage library files
-Requires: ocl-icd
-
-
-%description libs
-Portable Computing Lanugage runtime library files
-
-
 %package devel
 Summary:  Portable Computing Lanugage development files
 Group:    Development/Libraries
-Requires: %{name}-libs = %{version}-%{release}
+Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: pkgconfig
 Requires: opencl-headers
 
@@ -86,35 +76,32 @@ make check
 %postun -p /sbin/ldconfig
 
 
-%post libs -p /sbin/ldconfig
-%postun libs -p /sbin/ldconfig
-
-
 %files
 %doc README
-%{_bindir}/pocl-standalone
-%{_datadir}/pocl/
-
-
-%files libs
 %{_sysconfdir}/OpenCL/vendors/pocl.icd
+%{_bindir}/pocl-standalone
 %{_libdir}/libpocl.so.1.1.0
 %{_libdir}/libpocl.so.1
 %{_libdir}/libpoclu.so.1.1.0
 %{_libdir}/libpoclu.so.1
 %{_libdir}/pocl/
+%{_libdir}/pocl/llvmopencl.so
+%{_datadir}/pocl/
 
 
 %files devel
 %{_libdir}/libpoclu.so
 %{_libdir}/libpocl.so
-%{_libdir}/pocl/llvmopencl.so
 %{_libdir}/pkgconfig/pocl.pc
 %{_includedir}/pocl/
 %{_includedir}/poclu.h
 
 
 %changelog
+* Wed Aug 14 2013 Fabian Deutsch <fabiand@fedoraproject.org> - 0.8-4
+- Drop -libs subpackage
+- Fix -devel BR on base package
+
 * Wed Aug 14 2013 Fabian Deutsch <fabiand@fedoraproject.org> - 0.8-3
 - Add check
 - Enforce ICD usage
