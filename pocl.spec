@@ -2,8 +2,11 @@
 Summary:  Portable Computing Language
 Name:     pocl
 Version:  0.8
-Release:  4%{?dist}
-License:  MIT
+Release:  5%{?dist}
+# The whole code is under MIT
+# except include/utlist.h which is under BSD (and unbundled) and
+# except lib/kernel/vecmath which is under GPLv3+ or LGPLv3+ (and unbundled in future)
+License:  MIT and BSD and GPLv3+ or LGPLv3+
 Group:    System Environment/Libraries
 URL:      http://pocl.sourceforge.net
 Source0:  http://pocl.sourceforge.net/downloads/pocl-%{version}.tar.gz
@@ -19,6 +22,8 @@ BuildRequires: opencl-headers ocl-icd-devel
 BuildRequires: mesa-libGL-devel
 BuildRequires: llvm-devel clang
 BuildRequires: hwloc-devel
+BuildRequires: uthash-devel
+#BuildRequires: vecmath-devel
 
 Requires: clang
 
@@ -62,10 +67,19 @@ make %{?_smp_mflags}
 
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT
+make install DESTDIR=%{buildroot}
 
 # NOTE: We intentionally don't ship *.la files
-find $RPM_BUILD_ROOT -type f -name '*.la' | xargs rm -f -- || :
+find %{buildroot} -type f -name '*.la' | xargs rm -f -- || :
+
+# Unbundle utlist.h
+rm -vf %{buildroot}/%{_includedir}/pocl/utlist.h
+ln -vs %{_includedir}/utlist.h %{buildroot}/%{_includedir}/pocl/utlist.h
+
+# Unbundle vecmath
+#rm -vf %{buildroot}/%{_libdir}/pocl/vecmath/
+#ln -vs %{_includedir}/vecmath %{buildroot}/%{_libdir}/pocl/vecmath
+# <visit0r> but you need to run the .py to generate the files under the pocl dir
 
 
 %check
@@ -85,7 +99,6 @@ make check
 %{_libdir}/libpoclu.so.1.1.0
 %{_libdir}/libpoclu.so.1
 %{_libdir}/pocl/
-%{_libdir}/pocl/llvmopencl.so
 %{_datadir}/pocl/
 
 
@@ -98,6 +111,10 @@ make check
 
 
 %changelog
+* Thu Aug 15 2013 Fabian Deutsch <fabian.deutsch@gmx.de> - 0.8-5
+- Unbundle uthash
+- Updated licenses
+
 * Wed Aug 14 2013 Fabian Deutsch <fabiand@fedoraproject.org> - 0.8-4
 - Drop -libs subpackage
 - Fix -devel BR on base package
