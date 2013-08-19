@@ -2,7 +2,7 @@
 Summary:  Portable Computing Language
 Name:     pocl
 Version:  0.8
-Release:  5%{?dist}
+Release:  6%{?dist}
 # The whole code is under MIT
 # except include/utlist.h which is under BSD (and unbundled) and
 # except lib/kernel/vecmath which is under GPLv3+ or LGPLv3+ (and unbundled in future)
@@ -100,18 +100,23 @@ make check
 %{_libdir}/libpoclu.so.1
 %{_libdir}/pocl/
 %{_datadir}/pocl/
+# Is required at runtime to build kernels
+%{_includedir}/pocl/
 
 
 %files devel
 %{_libdir}/libpoclu.so
 %{_libdir}/libpocl.so
 %{_libdir}/pkgconfig/pocl.pc
-%{_includedir}/pocl/
 %{_includedir}/poclu.h
 
 
 %changelog
-* Thu Aug 15 2013 Fabian Deutsch <fabian.deutsch@gmx.de> - 0.8-5
+* Mon Aug 19 2013 Fabian Deutsch <fabiand@fedoraproject.org> - 0.8-6
+- Move includedir to base package. This is required to build
+  kernels at runtime.
+
+* Thu Aug 15 2013 Fabian Deutsch <fabiand@fedoraproject.org> - 0.8-5
 - Unbundle uthash
 - Updated licenses
 
