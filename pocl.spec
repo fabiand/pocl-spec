@@ -2,11 +2,11 @@
 Summary:  Portable Computing Language
 Name:     pocl
 Version:  0.8
-Release:  6%{?dist}
+Release:  7%{?dist}
 # The whole code is under MIT
 # except include/utlist.h which is under BSD (and unbundled) and
 # except lib/kernel/vecmath which is under GPLv3+ or LGPLv3+ (and unbundled in future)
-License:  MIT and BSD and GPLv3+ or LGPLv3+
+License:  MIT and BSD and (GPLv3+ or LGPLv3+)
 Group:    System Environment/Libraries
 URL:      http://pocl.sourceforge.net
 Source0:  http://pocl.sourceforge.net/downloads/pocl-%{version}.tar.gz
@@ -18,14 +18,16 @@ ExcludeArch: ppc
 ExcludeArch: ppc64
 
 BuildRequires: pkgconfig automake autoconf libtool libtool-ltdl-devel
-BuildRequires: opencl-headers ocl-icd-devel 
+BuildRequires: opencl-filesystem opencl-headers ocl-icd-devel
 BuildRequires: mesa-libGL-devel
 BuildRequires: llvm-devel clang
 BuildRequires: hwloc-devel
 BuildRequires: uthash-devel
 #BuildRequires: vecmath-devel
 
+Requires: opencl-filesystem
 Requires: clang
+Requires: uthash
 
 
 %description
@@ -59,10 +61,14 @@ Portable Computing Lanugage development files
 %prep
 %setup -q
 
+# Unbundle uthash
+find . -depth -name utlist* | xargs rm -f
+
 
 %build
 %configure --disable-static \
-    --enable-icd --enable-tests-with-icd=default
+           --enable-icd \
+           --enable-tests-with-icd=default
 make %{?_smp_mflags}
 
 
@@ -112,6 +118,11 @@ make check
 
 
 %changelog
+* Wed Aug 28 2013 Fabian Deutsch <fabiand@fedoraproject.org> - 0.8-7
+- Add requirements on opencl-filesystem and uthash
+- Remove uthash sources during prep
+- Fix license field
+
 * Mon Aug 19 2013 Fabian Deutsch <fabiand@fedoraproject.org> - 0.8-6
 - Move includedir to base package. This is required to build
   kernels at runtime.
